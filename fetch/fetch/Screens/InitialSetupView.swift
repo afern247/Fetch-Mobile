@@ -34,13 +34,7 @@ struct InitialSetupView: View {
     
     private func refreshRecipes() {
         Task(priority: .userInitiated) {
-            if let recipes = await vm.fetchRecipes(for: vm.endpoint) {
-                vm.recipes = recipes
-                vm.showErrorView = false
-            } else {
-                vm.showErrorView = true
-            }
-            
+            await vm.fetchRecipes(for: vm.endpoint)
             isInitialSetupDone = true
         }
     }

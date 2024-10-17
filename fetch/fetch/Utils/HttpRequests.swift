@@ -15,7 +15,17 @@ enum HTTPMethod: String {
 }
 
 struct NetworkHandler {
-    
+
+    /// Makes an asynchronous network request and returns the raw data.
+    /// - Parameters:
+    ///   - urlString: The URL string to make the request to.
+    ///   - method: The HTTP method to use (GET, POST, etc.).
+    /// - Returns: The raw `Data` from the response, or `nil` if an error occurs.
+    ///
+    /// Sample usage:
+    /// ```swift
+    /// let data = await NetworkHandler.request(urlString: "https://api.example.com", method: .get)
+    /// ```
     static func request(urlString: String, method: HTTPMethod) async -> Data? {
         guard let url = URL(string: urlString) else {
             log.error("Invalid URL: \(urlString)")
@@ -42,7 +52,18 @@ struct NetworkHandler {
             return nil
         }
     }
-    
+
+    /// Makes an asynchronous network request, decodes the response into a specified type, and returns the decoded object.
+    /// - Parameters:
+    ///   - urlString: The URL string to make the request to.
+    ///   - method: The HTTP method to use (GET, POST, etc.).
+    /// - Returns: The decoded object of type `T`, or `nil` if an error occurs.
+    ///
+    /// Sample usage:
+    /// ```swift
+    /// struct MyData: Decodable { let id: Int }
+    /// let decodedData: MyData? = await NetworkHandler.requestAndDecode(urlString: "https://api.example.com", method: .get)
+    /// ```
     static func requestAndDecode<T: Decodable>(urlString: String, method: HTTPMethod) async -> T? {
         guard let data = await request(urlString: urlString, method: method) else { return nil }
         

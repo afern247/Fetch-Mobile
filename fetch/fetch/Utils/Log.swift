@@ -32,6 +32,19 @@ class Logger {
         log(errorMessage, [], type: .debug)
     }
     
+    /// Logs messages or errors based on the log type (error, warn, debug).
+    /// - Parameters:
+    ///   - message: The message to log.
+    ///   - args: Additional arguments to include in the log.
+    ///   - type: The type of log (error, warn, debug).
+    ///
+    /// Sample usage:
+    /// ```swift
+    /// log.error("An error occurred", someError)
+    /// log.warn("This is a warning", someVariable)
+    /// log.debug("Debugging info", someDebugInfo)
+    /// log.debug(someError, "Optional error message")
+    /// ```
     private static func log(_ message: String, _ args: [Any], type: LogType) {
         let composedMessage = args.compactMap { arg -> String? in
             if let error = arg as? CustomStringConvertible {

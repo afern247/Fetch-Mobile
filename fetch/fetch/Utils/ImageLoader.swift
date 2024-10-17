@@ -11,6 +11,7 @@ struct LoadImageFromUrl: View {
     let urlString: String
     @State private var image: Image = Image(illustration: .spinnerImage)
     @State private var isLoading = false
+    @State private var task: Task<Void, Never>? // Tracks the task for cancellation
     
     var body: some View {
         image
@@ -22,19 +23,27 @@ struct LoadImageFromUrl: View {
                     loadImage()
                 }
             }
+            .onDisappear {
+                cancelLoading() // Cancel the task when the view disappears
+            }
     }
     
     private func loadImage() {
         guard let url = URL(string: urlString) else { return }
         isLoading = true
         
-        Task {
+        task = Task {
             let loadedImage = await ImageCache.shared.loadImage(from: url)
             DispatchQueue.main.async {
                 self.image = loadedImage
                 self.isLoading = false
             }
         }
+    }
+    
+    private func cancelLoading() {
+        task?.cancel() // Cancel the task if it's still running
+        isLoading = false
     }
 }
 

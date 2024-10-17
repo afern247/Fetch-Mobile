@@ -17,7 +17,8 @@ Clone the repo and open `fetch.xcodeproj` and run it on the simulator.
 
 ### Time Spent: Approximately how long did you spend working on this project? How did you allocate your time?
 
-About 5-6h because I was adding extra things, normally a simple fetch takes less than 5 min but for a code review it needs to have a solid foundation.
+I spent around 4-5 hours on this project, focusing first on core functionality (fetching and displaying data), then adding performance optimizations (lazy loading, image caching), and finally polishing the UI with animations and transitions.
+I aimed to write production-ready code by focusing on clean architecture (MVVM), performance optimizations, and using the latest SwiftUI features.
 
 ### Trade-offs and Decisions: Did you make any significant trade-offs in your approach?
 Time, to be able to make it more robust.

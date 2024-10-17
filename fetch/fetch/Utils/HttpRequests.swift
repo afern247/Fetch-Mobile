@@ -15,7 +15,7 @@ enum HTTPMethod: String {
 }
 
 struct NetworkHandler {
-
+    
     /// Makes an asynchronous network request and returns the raw data.
     /// - Parameters:
     ///   - urlString: The URL string to make the request to.
@@ -52,7 +52,7 @@ struct NetworkHandler {
             return nil
         }
     }
-
+    
     /// Makes an asynchronous network request, decodes the response into a specified type, and returns the decoded object.
     /// - Parameters:
     ///   - urlString: The URL string to make the request to.

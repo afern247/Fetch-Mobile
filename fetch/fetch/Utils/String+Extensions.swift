@@ -5,6 +5,7 @@
 //  Created by Arturo on 10/16/24.
 //
 
+import CryptoKit
 import Foundation
 
 extension String {
@@ -30,6 +31,16 @@ extension String {
             // String is empty
             return true
         }
+    }
+    
+    /// Generates a SHA-256 hash of the string.
+    /// This is used to create a unique identifier for each URL, ensuring that images with the same filename
+    /// but different URLs (e.g., `https://example.com/image.png` vs `https://another.com/image.png`)
+    /// are stored separately on disk.
+    func sha256() -> String {
+        let data = Data(self.utf8)
+        let hash = SHA256.hash(data: data)
+        return hash.compactMap { String(format: "%02x", $0) }.joined()
     }
 }
 

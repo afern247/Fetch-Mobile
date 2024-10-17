@@ -60,7 +60,7 @@ struct RecipesListView: View {
     @ViewBuilder
     private func recipeCard(_ recipe: Recipe) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            LoadImageFromUrl(urlString: recipe.photoURLLarge)
+            LoadImageFromUrl(urlString: (recipe.photoURLLarge.isEmptyOrWhiteSpace() ? recipe.photoURLSmall : recipe.photoURLLarge)) // using larger image for better quality, this depends on the design.
             
             Text(recipe.name)
                 .typography(.headerLarge, textAlignment: .leading, color: .fillPrimary, multiline: true)

@@ -43,13 +43,13 @@ class RecipeListViewModel {
     /// ```
     func fetchRecipes(for endpoint: Endpoints = .recipes) async {
         if let fetchedRecipes = await recipeService.fetchRecipes(for: endpoint) {
-            DispatchQueue.main.async {
-                self.recipes = fetchedRecipes
-                self.showErrorView = false
+            DispatchQueue.main.async { [weak self] in
+                self?.recipes = fetchedRecipes
+                self?.showErrorView = false
             }
         } else {
-            DispatchQueue.main.async {
-                self.showErrorView = true
+            DispatchQueue.main.async { [weak self] in
+                self?.showErrorView = true
             }
         }
     }

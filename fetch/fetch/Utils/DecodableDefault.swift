@@ -11,11 +11,11 @@ import Foundation
 @propertyWrapper
 public struct DecodableDefault<Default: DefaultDecodableValue>: Decodable {
     public var wrappedValue: Default.Value
-
+    
     public init(wrappedValue: Default.Value) {
         self.wrappedValue = wrappedValue
     }
-
+    
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         self.wrappedValue = (try? container.decode(Default.Value.self)) ?? Default.defaultValue
@@ -23,7 +23,7 @@ public struct DecodableDefault<Default: DefaultDecodableValue>: Decodable {
 }
 
 extension KeyedDecodingContainer {
-
+    
     public func decode<T>(_: DecodableDefault<T>.Type,
                           forKey key: KeyedDecodingContainer<K>.Key) throws -> DecodableDefault<T> {
         if let value = try decodeIfPresent(DecodableDefault<T>.self, forKey: key) {
@@ -34,11 +34,11 @@ extension KeyedDecodingContainer {
 }
 
 extension DecodableDefault: Encodable where Default.Value: Encodable {
-
+    
     public func encode(to encoder: Encoder) throws {
         try wrappedValue.encode(to: encoder)
     }
-
+    
 }
 
 extension DecodableDefault: Equatable where Default.Value: Equatable { }
@@ -49,14 +49,14 @@ extension DecodableDefault: Hashable where Default.Value: Hashable { }
 /// A Decodable type that can provide a default value for a missing/null field
 public protocol DefaultDecodableValue {
     associatedtype Value: Decodable
-
+    
     static var defaultValue: Value { get }
 }
 
 /// Defaults numeric types to `0` when decoding a missing/null field
 public enum DefaultZero<T: Numeric & Decodable>: DefaultDecodableValue {
     public typealias Value = T
-
+    
     public static var defaultValue: Value { 0 }
 }
 

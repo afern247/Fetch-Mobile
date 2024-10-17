@@ -66,4 +66,3 @@ let mockRecipesResponse = RecipesResponse(
         )
     ]
 )
-

@@ -60,17 +60,25 @@ class ImageCache {
     private let queue = DispatchQueue(label: "com.imageCache.expirationDatesQueue") // Serial queue for thread safety
     let placeholderImage: Image = Image(systemName: "photo") // Placeholder image
     
-    /// Loads an image from the cache or network asynchronously.
+    /// Loads an image from the cache, disk, or network asynchronously.
     /// - Parameter url: The URL of the image to load.
     /// - Returns: The loaded `Image`, or a placeholder if the image cannot be loaded.
     func loadImage(from url: URL) async -> Image {
         clearExpiredEntries()
         
+        // Check if the image is cached in memory
         if let cachedUIImage = cache.object(forKey: url as NSURL),
            let expirationDate = queue.sync(execute: { expirationDates[url] }), expirationDate > Date() {
             return Image(uiImage: cachedUIImage)
         }
         
+        // Check if the image is cached on disk
+        if let diskImage = loadImageFromDisk(for: url) {
+            cache.setObject(diskImage, forKey: url as NSURL) // Cache it in memory
+            return Image(uiImage: diskImage)
+        }
+        
+        // Fetch the image from the network
         do {
             let (data, response) = try await URLSession.shared.data(from: url)
             
@@ -82,7 +90,9 @@ class ImageCache {
                 return placeholderImage
             }
             
+            // Cache the image in memory and on disk
             cache.setObject(uiImage, forKey: url as NSURL)
+            saveImageToDisk(uiImage, for: url)
             queue.sync {
                 expirationDates[url] = Date().addingTimeInterval(cacheDuration)
             }
@@ -91,6 +101,27 @@ class ImageCache {
         } catch {
             return placeholderImage
         }
+    }
+    
+    /// Saves the image to disk.
+    private func saveImageToDisk(_ image: UIImage, for url: URL) {
+        guard let data = image.pngData() else { return }
+        let fileURL = getDiskCacheURL(for: url)
+        try? data.write(to: fileURL)
+    }
+    
+    /// Loads the image from disk if available.
+    private func loadImageFromDisk(for url: URL) -> UIImage? {
+        let fileURL = getDiskCacheURL(for: url)
+        guard let data = try? Data(contentsOf: fileURL) else { return nil }
+        return UIImage(data: data)
+    }
+    
+    /// Returns the file URL for the cached image on disk.
+    private func getDiskCacheURL(for url: URL) -> URL {
+        let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        let hashedFileName = url.absoluteString.sha256() // Generates a unique hash for the URL
+        return cacheDirectory.appendingPathComponent(hashedFileName)
     }
     
     /// Clears expired entries from the cache.

@@ -22,6 +22,7 @@ struct AppLaunchView: View {
                 
                 Spacer()
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .background(.white)
         .onAppear {

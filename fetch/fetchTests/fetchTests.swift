@@ -14,17 +14,15 @@ final class fetchTests: XCTestCase {
     var mockService: MockRecipeService!
     
     override func setUpWithError() throws {
-        // Initialize the mock service and view model before each test
         mockService = MockRecipeService()
         viewModel = RecipeListViewModel(recipeService: mockService)
     }
-
+    
     override func tearDownWithError() throws {
-        // Clean up after each test
         viewModel = nil
         mockService = nil
     }
-
+    
     func testFetchRecipesSuccess() async throws {
         // Given
         mockService.mockResponse = mockRecipesResponse.recipes
@@ -37,7 +35,7 @@ final class fetchTests: XCTestCase {
         }
         
         // Then
-        wait(for: [expectation], timeout: 5.0) // Timeout after 5 seconds
+        await fulfillment(of: [expectation], timeout: 5.0)
         XCTAssertFalse(viewModel.showErrorView, "Error view should not be shown on success")
         XCTAssertEqual(viewModel.recipes.count, mockRecipesResponse.recipes.count, "Recipes count should match the mock response")
         XCTAssertEqual(viewModel.recipes.first?.name, "Apam Balik", "First recipe name should match the mock data")
@@ -45,49 +43,68 @@ final class fetchTests: XCTestCase {
     
     func testFetchRecipesFailure() async throws {
         // Given
-        mockService.mockResponse = nil // Simulate failure
+        mockService.mockResponse = nil
         
         // When
         let expectation = XCTestExpectation(description: "Fetch recipes failure")
         Task {
-            await viewModel.fetchRecipes(for: .recipes)
+            await viewModel.fetchRecipes(for: .malformedData)
             expectation.fulfill()
         }
         
         // Then
-        wait(for: [expectation], timeout: 5.0) // Timeout after 5 seconds
+        await fulfillment(of: [expectation], timeout: 5.0)
         XCTAssertTrue(viewModel.showErrorView, "Error view should be shown on failure")
         XCTAssertTrue(viewModel.recipes.isEmpty, "Recipes should be empty on failure")
     }
     
-    func testRefreshRecipesToggle() {
+    func testFetchRecipesEmptyResponse() async throws {
         // Given
-        XCTAssertFalse(viewModel.refreshRecipes, "Initial refreshRecipes should be false")
+        mockService.mockResponse = []
         
         // When
-        viewModel.refreshRecipes.toggle()
+        let expectation = XCTestExpectation(description: "Fetch recipes with empty response")
+        Task {
+            await viewModel.fetchRecipes(for: .emptyData)
+            expectation.fulfill()
+        }
         
         // Then
-        XCTAssertTrue(viewModel.refreshRecipes, "refreshRecipes should toggle to true")
+        await fulfillment(of: [expectation], timeout: 5.0)
+        XCTAssertFalse(viewModel.showErrorView, "Error view should not be shown on empty response")
+        XCTAssertTrue(viewModel.recipes.isEmpty, "Recipes should be empty when the response is empty")
     }
     
-    func testPerformanceFetchRecipes() throws {
-        measure {
-            let expectation = XCTestExpectation(description: "Performance test for fetchRecipes")
-            Task {
-                await viewModel.fetchRecipes(for: .recipes)
-                expectation.fulfill()
-            }
-            wait(for: [expectation], timeout: 5.0) // Timeout after 5 seconds
+    func testFetchRecipesTimeout() async throws {
+        // Given
+        mockService.mockResponse = nil
+        
+        // Simulate a delay in the mock service
+        mockService.delay = 4.0
+        
+        // When
+        let expectation = XCTestExpectation(description: "Fetch recipes timeout")
+        Task {
+            await viewModel.fetchRecipes(for: .emptyData)
+            expectation.fulfill()
         }
+        
+        // Then
+        await fulfillment(of: [expectation], timeout: 5.0)
+        XCTAssertTrue(viewModel.showErrorView, "Error view should be shown on timeout")
+        XCTAssertTrue(viewModel.recipes.isEmpty, "Recipes should be empty on timeout")
     }
 }
 
 // Mock service to simulate network responses
 class MockRecipeService: RecipeServiceProtocol {
     var mockResponse: [Recipe]?
+    var delay: TimeInterval = 0.0 // To mock timeout
     
     func fetchRecipes(for endpoint: Endpoints) async -> [Recipe]? {
+        if delay > 0 {
+            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+        }
         return mockResponse
     }
 }

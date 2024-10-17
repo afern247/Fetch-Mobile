@@ -98,6 +98,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		691B44042CC0C81D002571BD /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				6956D6322CC06D4F0040FE17 /* RecipeListModel.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		6956D5C12CC03DE30040FE17 = {
 			isa = PBXGroup;
 			children = (
@@ -255,8 +263,8 @@
 			isa = PBXGroup;
 			children = (
 				6956D62E2CC06D0C0040FE17 /* RecipeListView.swift */,
-				6956D6322CC06D4F0040FE17 /* RecipeListModel.swift */,
 				6956D6492CC0A6C50040FE17 /* ViewModels */,
+				691B44042CC0C81D002571BD /* Models */,
 			);
 			path = RecipeList;
 			sourceTree = "<group>";
@@ -272,8 +280,8 @@
 		6956D6492CC0A6C50040FE17 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				6956D6302CC06D180040FE17 /* RecipeListViewModel.swift */,
 				6956D64A2CC0A6D50040FE17 /* RecipeService.swift */,
+				6956D6302CC06D180040FE17 /* RecipeListViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -574,10 +582,11 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.fetchrewards.fetch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Debug;
@@ -612,10 +621,11 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.fetchrewards.fetch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2,7";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				XROS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Release;

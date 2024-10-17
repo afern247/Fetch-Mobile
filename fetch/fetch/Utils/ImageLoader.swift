@@ -28,6 +28,9 @@ struct LoadImageFromUrl: View {
             }
     }
     
+    /// Loads the image from the provided URL asynchronously and updates the view.
+    /// If the image is cached, it will be loaded from the cache.
+    /// If the image is not cached, it will be fetched from the network.
     private func loadImage() {
         guard let url = URL(string: urlString) else { return }
         isLoading = true
@@ -41,8 +44,9 @@ struct LoadImageFromUrl: View {
         }
     }
     
+    /// Cancels the image loading task if it's still running.
     private func cancelLoading() {
-        task?.cancel() // Cancel the task if it's still running
+        task?.cancel()
         isLoading = false
     }
 }
@@ -56,6 +60,9 @@ class ImageCache {
     private let queue = DispatchQueue(label: "com.imageCache.expirationDatesQueue") // Serial queue for thread safety
     let placeholderImage: Image = Image(systemName: "photo") // Placeholder image
     
+    /// Loads an image from the cache or network asynchronously.
+    /// - Parameter url: The URL of the image to load.
+    /// - Returns: The loaded `Image`, or a placeholder if the image cannot be loaded.
     func loadImage(from url: URL) async -> Image {
         clearExpiredEntries()
         
@@ -86,6 +93,7 @@ class ImageCache {
         }
     }
     
+    /// Clears expired entries from the cache.
     private func clearExpiredEntries() {
         let now = Date()
         queue.sync {

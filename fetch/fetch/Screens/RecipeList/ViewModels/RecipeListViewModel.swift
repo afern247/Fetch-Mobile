@@ -53,4 +53,21 @@ class RecipeListViewModel {
             }
         }
     }
+    
+    /// Filters recipes by a specific cuisine or returns all if "All" is selected
+    /// Usage: let filteredRecipes = filterRecipes(by: "Italian")
+    func filterRecipes(by cuisine: String) -> [Recipe] {
+        if cuisine == "All" {   // hardcoded for since I don't have the schema contract and the data could be different.
+            return recipes
+        } else {
+            return recipes.filter { $0.cuisine == cuisine }
+        }
+    }
+    
+    /// Returns a sorted list of unique available cuisines
+    /// Usage: let cuisines = getAvailableCuisines()
+    func getAvailableCuisines() -> [String] {
+        let cuisines = recipes.map { $0.cuisine }.filter { !$0.isEmpty }
+        return Array(Set(cuisines)).sorted()
+    }
 }

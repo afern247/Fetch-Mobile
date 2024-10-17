@@ -11,6 +11,12 @@ struct RecipesListView: View {
     
     @Environment(RecipeListViewModel.self) private var vm
     
+    @State private var selectedCuisine: String = "All"
+    
+    private var filteredRecipes: [Recipe] {
+        vm.filterRecipes(by: selectedCuisine)
+    }
+    
     var body: some View {
         Group {
             if vm.showErrorView {
@@ -35,13 +41,29 @@ struct RecipesListView: View {
                     .pickerStyle(SegmentedPickerStyle())
                     .padding()
                     
+                    HStack {
+                        Spacer()
+                        
+                        // Cuisine Filter Picker
+                        Picker("Select Cuisine", selection: $selectedCuisine) {
+                            Text("All")
+                                .tag("All")
+                            ForEach(vm.getAvailableCuisines(), id: \.self) { cuisine in
+                                Text(cuisine)
+                                    .tag(cuisine)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .padding(.horizontal)
+                    }
+                    
                     ScrollView(showsIndicators: false) {
-                        if vm.recipes.isEmpty {
+                        if filteredRecipes.isEmpty {
                             ContentUnavailableView(image: "tray", title: "Empty", message: "There are no recipes available")
                                 .padding(.top, .spacing24)
                         } else {
                             LazyVStack(spacing: .spacing24) {
-                                ForEach(vm.recipes, id: \.uuid) { recipe in
+                                ForEach(filteredRecipes, id: \.uuid) { recipe in
                                     recipeCard(recipe)
                                 }
                             }
@@ -60,7 +82,7 @@ struct RecipesListView: View {
     @ViewBuilder
     private func recipeCard(_ recipe: Recipe) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            LoadImageFromUrl(urlString: (recipe.photoURLLarge.isEmptyOrWhiteSpace() ? recipe.photoURLSmall : recipe.photoURLLarge)) // using larger image for better quality, this depends on the design.
+            LoadImageFromUrl(urlString: (recipe.photoURLLarge.isEmptyOrWhiteSpace() ? recipe.photoURLSmall : recipe.photoURLLarge))
             
             Text(recipe.name)
                 .typography(.headerLarge, textAlignment: .leading, color: .fillPrimary, multiline: true)

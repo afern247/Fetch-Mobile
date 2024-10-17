@@ -12,14 +12,14 @@ extension Color {
     public static let allFColors: [Color] = FColor.allCases.map { $0.color }
     
     public static let f100 = FColor.f100.color
-    public static let f110 = FColor.f100.color
-    public static let f200 = FColor.f100.color
+    public static let f110 = FColor.f110.color
+    public static let f200 = FColor.f200.color
     public static let f220 = FColor.f220.color
-    public static let f500 = FColor.f100.color
-    public static let f600 = FColor.f100.color
+    public static let f500 = FColor.f500.color
+    public static let f600 = FColor.f600.color
     public static let f810 = FColor.f810.color
-    public static let f880 = FColor.f100.color
-    public static let f900 = FColor.f100.color
+    public static let f880 = FColor.f880.color
+    public static let f900 = FColor.f900.color
 }
 
 extension Color {

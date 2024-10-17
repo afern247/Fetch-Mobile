@@ -9,6 +9,7 @@ import SwiftUI
 
 struct AppLaunchView: View {
     
+    @Environment(RecipeListViewModel.self) private var vm
     
     var body: some View {
         ZStack {
@@ -24,12 +25,12 @@ struct AppLaunchView: View {
         }
         .background(.white)
         .onAppear {
-            
+            vm.refreshRecipes.toggle()
         }
     }
-    
 }
 
 #Preview {
     AppLaunchView()
+        .environment(RecipeListViewModel())
 }

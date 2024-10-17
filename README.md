@@ -24,7 +24,7 @@ I aimed to write production-ready code by focusing on clean architecture (MVVM),
 Time, to be able to make it more robust.
 
 ### Weakest Part of the Project: What do you think is the weakest part of your project?
-UITest(?)
+UITest
 
 ### External Code and Dependencies: Did you use any external code, libraries, or dependencies?
 No I didn't use any to not be penalized (if there is such a thing) but if a library I would have used in a real project is Alamofire, I think it's a great package and a must have.

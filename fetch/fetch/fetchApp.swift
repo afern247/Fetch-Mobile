@@ -11,7 +11,7 @@ import SwiftUI
 struct fetchApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            InitialSetupView()
         }
     }
 }

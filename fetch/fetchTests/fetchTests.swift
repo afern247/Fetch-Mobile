@@ -6,30 +6,105 @@
 //
 
 import XCTest
+@testable import fetch
 
 final class fetchTests: XCTestCase {
-
+    
+    var viewModel: RecipeListViewModel!
+    var mockService: MockRecipeService!
+    
     override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        mockService = MockRecipeService()
+        viewModel = RecipeListViewModel(recipeService: mockService)
     }
-
+    
     override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        viewModel = nil
+        mockService = nil
     }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // Any test you write for XCTest can be annotated as throws and async.
-        // Mark your test throws to produce an unexpected failure when your test encounters an uncaught error.
-        // Mark your test async to allow awaiting for asynchronous code to complete. Check the results with assertions afterwards.
-    }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        measure {
-            // Put the code you want to measure the time of here.
+    
+    func testFetchRecipesSuccess() async throws {
+        // Given
+        mockService.mockResponse = mockRecipesResponse.recipes
+        
+        // When
+        let expectation = XCTestExpectation(description: "Fetch recipes successfully")
+        Task {
+            await viewModel.fetchRecipes(for: .recipes)
+            expectation.fulfill()
         }
+        
+        // Then
+        await fulfillment(of: [expectation], timeout: 5.0)
+        XCTAssertFalse(viewModel.showErrorView, "Error view should not be shown on success")
+        XCTAssertEqual(viewModel.recipes.count, mockRecipesResponse.recipes.count, "Recipes count should match the mock response")
+        XCTAssertEqual(viewModel.recipes.first?.name, "Apam Balik", "First recipe name should match the mock data")
     }
+    
+    func testFetchRecipesFailure() async throws {
+        // Given
+        mockService.mockResponse = nil
+        
+        // When
+        let expectation = XCTestExpectation(description: "Fetch recipes failure")
+        Task {
+            await viewModel.fetchRecipes(for: .malformedData)
+            expectation.fulfill()
+        }
+        
+        // Then
+        await fulfillment(of: [expectation], timeout: 5.0)
+        XCTAssertTrue(viewModel.showErrorView, "Error view should be shown on failure")
+        XCTAssertTrue(viewModel.recipes.isEmpty, "Recipes should be empty on failure")
+    }
+    
+    func testFetchRecipesEmptyResponse() async throws {
+        // Given
+        mockService.mockResponse = []
+        
+        // When
+        let expectation = XCTestExpectation(description: "Fetch recipes with empty response")
+        Task {
+            await viewModel.fetchRecipes(for: .emptyData)
+            expectation.fulfill()
+        }
+        
+        // Then
+        await fulfillment(of: [expectation], timeout: 5.0)
+        XCTAssertFalse(viewModel.showErrorView, "Error view should not be shown on empty response")
+        XCTAssertTrue(viewModel.recipes.isEmpty, "Recipes should be empty when the response is empty")
+    }
+    
+    func testFetchRecipesTimeout() async throws {
+        // Given
+        mockService.mockResponse = nil
+        
+        // Simulate a delay in the mock service
+        mockService.delay = 4.0
+        
+        // When
+        let expectation = XCTestExpectation(description: "Fetch recipes timeout")
+        Task {
+            await viewModel.fetchRecipes(for: .emptyData)
+            expectation.fulfill()
+        }
+        
+        // Then
+        await fulfillment(of: [expectation], timeout: 5.0)
+        XCTAssertTrue(viewModel.showErrorView, "Error view should be shown on timeout")
+        XCTAssertTrue(viewModel.recipes.isEmpty, "Recipes should be empty on timeout")
+    }
+}
 
+// Mock service to simulate network responses
+class MockRecipeService: RecipeServiceProtocol {
+    var mockResponse: [Recipe]?
+    var delay: TimeInterval = 0.0 // To mock timeout
+    
+    func fetchRecipes(for endpoint: Endpoints) async -> [Recipe]? {
+        if delay > 0 {
+            try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+        }
+        return mockResponse
+    }
 }
